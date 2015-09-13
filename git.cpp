@@ -29,6 +29,19 @@ namespace Git {
     return name;
   }
 
+  OptionalReference Reference::branch_upstream()
+  {
+    git_reference *out;
+    int error = git_branch_upstream(&out, ref);
+
+    if (error != GIT_ENOTFOUND) {
+      check_git_error(error);
+      return Reference(out);
+    } else {
+      return {};
+    }
+  }
+
   std::vector<Reference> branches(git_repository *repo, git_branch_t list_flags)
   {
     std::vector<Reference> result;

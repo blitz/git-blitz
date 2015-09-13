@@ -16,12 +16,13 @@ int main(int argc, char **argv)
   try {
     g_repository_open(&repo, ".");
 
-    for (auto &ref : Git::branches(repo, GIT_BRANCH_ALL)) {
-      printf("%s\n", ref.branch_name().c_str());
+    for (auto &ref : Git::branches(repo, GIT_BRANCH_LOCAL)) {
+      auto upstream = ref.branch_upstream();
+      printf("%s tracks %s\n", ref.branch_name().c_str(), upstream ? upstream->branch_name().c_str() : "nothing");
     }
 
   } catch (Git::Error const &ge) {
-    fprintf(stderr, "Git error: %s\n", ge.error->message);
+    fprintf(stderr, "Git error %d: %s\n", ge.error_code, ge.error->message);
   }
 
   return 0;
