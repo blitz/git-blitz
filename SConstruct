@@ -1,6 +1,6 @@
 # -*- Mode: Python -*-
 
-OPTFLAGS = " -g -O1 "
+OPTFLAGS = " -g -Os "
 
 env = Environment(CCFLAGS   = OPTFLAGS,
                   LINKFLAGS = OPTFLAGS,
@@ -12,6 +12,6 @@ env = Environment(CCFLAGS   = OPTFLAGS,
 env.ParseConfig("pkg-config libgit2 --cflags --libs")
 
 
-env.Program("git-blitz", ["main.cpp"])
+env.Program("git-blitz", ["main.cpp", "git.cpp"])
 
 # EOF
