@@ -20,7 +20,7 @@ namespace Git {
     }
   }
 
-  std::string Reference::branch_name()
+  std::string Reference::branch_name() const
   {
     const char *name = nullptr;
 
@@ -29,7 +29,7 @@ namespace Git {
     return name;
   }
 
-  OptionalReference Reference::branch_upstream()
+  OptionalReference Reference::branch_upstream() const
   {
     git_reference *out;
     int error = git_branch_upstream(&out, ref);
@@ -39,6 +39,37 @@ namespace Git {
       return Reference(out);
     } else {
       return {};
+    }
+  }
+
+  OptionalOID Reference::target() const
+  {
+    git_oid const *oid = git_reference_target(ref);
+
+    if (oid) {
+      return *oid;
+    } else {
+      return {};
+    }
+  }
+
+  OptionalCommit Commit::from_reference(git_repository *repo, Reference const &ref)
+  {
+    auto target = ref.target();
+    if (!target) {
+      return {};
+    }
+
+    git_commit *commit;
+    wrap(git_commit_lookup)(&commit, repo, &*target);
+
+    return Commit(commit);
+  }
+
+  Commit::~Commit()
+  {
+    if (commit) {
+      wrap(git_commit_free)(commit);
     }
   }
 
