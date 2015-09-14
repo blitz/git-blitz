@@ -26,6 +26,8 @@ namespace Git {
     };
   }
 
+  // This is just here to make you think less when you wrap git_*
+  // library calls.
   template <typename... ARGS>
   static auto wrap(void (*fn)(ARGS...))
   {
@@ -37,6 +39,25 @@ namespace Git {
   using OptionalReference = std::experimental::optional<Reference>;
   using OptionalCommit    = std::experimental::optional<Commit>;
   using OptionalOID       = std::experimental::optional<git_oid>;
+
+
+  class Repository {
+    git_repository *repo;
+
+  public:
+    Repository(git_repository *repo_) : repo(repo_) {}
+    ~Repository();
+
+    Repository(Repository const &src) = delete;
+    Repository &operator=(Repository const &src) = delete;
+
+    Repository(Repository &&src) : repo(nullptr) { std::swap(repo, src.repo); }
+    Repository &operator=(Repository &&src) { std::swap(repo, src.repo); return *this; }
+
+    static Repository from_path(const char *path);
+
+    operator git_repository *() { return repo; }
+  };
 
   class Reference {
     git_reference *ref;
@@ -50,6 +71,8 @@ namespace Git {
 
     Reference(Reference &&src) : ref(nullptr) { std::swap(ref, src.ref); }
     Reference &operator=(Reference &&src) { std::swap(ref, src.ref); return *this; }
+
+    operator git_reference *() { return ref; }
 
     // Wraps git_branch_name.
     std::string branch_name() const;
@@ -72,6 +95,8 @@ namespace Git {
 
     Commit(Commit &&src) : commit(nullptr) { std::swap(commit, src.commit); }
     Commit &operator=(Commit &&src) { std::swap(commit, src.commit); return *this; }
+
+    operator git_commit *() { return commit; }
 
     git_time_t time() const { return git_commit_time(commit); }
 

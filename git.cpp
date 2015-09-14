@@ -5,13 +5,26 @@ namespace Git {
   Error::Error(int ec)
     : error_code(ec), error(giterr_last())
   {}
-  
+
   void check_git_error(int error)
   {
     if (error < 0) {
       throw Error(error);
     }
   }
+
+  Repository Repository::from_path(const char *path)
+  {
+    git_repository *repo = nullptr;
+    wrap(git_repository_open)(&repo, path);
+    return Repository(repo);
+  }
+
+  Repository::~Repository()
+  {
+    git_repository_free(repo);
+  }
+
 
   Reference::~Reference()
   {

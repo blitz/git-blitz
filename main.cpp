@@ -10,15 +10,13 @@ static const auto g_oid_fromstr     = Git::wrap(git_oid_fromstr);
 
 int main(int argc, char **argv)
 {
-  git_repository *repo = nullptr;
-
   git_libgit2_init();
   atexit([] { git_libgit2_shutdown(); });
 
   try {
-    g_repository_open(&repo, ".");
+    auto repo = Git::Repository::from_path(".");
 
-    auto ref_time_larger_sort = [repo] (Git::Reference const &a, Git::Reference const &b) -> bool {
+    auto const ref_time_larger_sort = [&repo] (Git::Reference const &a, Git::Reference const &b) -> bool {
       auto commit_a = Git::Commit::from_reference(repo, a);
       auto commit_b = Git::Commit::from_reference(repo, b);
 
