@@ -74,6 +74,16 @@ namespace Git {
 
     operator git_reference *() { return ref; }
 
+    operator git_oid () const {
+      auto t = target();
+
+      if (not t) {
+        throw Error(GIT_ENOTFOUND);
+      }
+
+      return *t;
+    }
+
     // Wraps git_branch_name.
     std::string branch_name() const;
 
@@ -109,6 +119,12 @@ namespace Git {
 
   // Wraps git_branch_iterator.
   std::vector<Reference> branches(git_repository *repo, git_branch_t list_flags);
+
+
+  // Wraps git_revwalk and friends.
+  std::vector<git_oid> revwalk(git_repository *repo, git_oid const &from, git_oid const &to);
+
+  OptionalOID mergebase(git_repository *repo, git_oid const &one, git_oid const &two);
 }
 
 // EOF

@@ -13,6 +13,8 @@ AlwaysBuild(Command('version.inc', ['version.hpp'],
 
 # We use libgit2 for git repository access.
 env.ParseConfig("pkg-config libgit2 --cflags --libs")
+
+# We use Boost::program_options
 env['LIBS'].append('boost_program_options')
 
 env.Program("git-blitz", Glob("*.cpp"))

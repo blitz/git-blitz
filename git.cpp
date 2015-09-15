@@ -114,6 +114,51 @@ namespace Git {
 
     return result;
   }
+
+  std::vector<git_oid> revwalk(git_repository *repo, git_oid const &from, git_oid const &to)
+  {
+    std::vector<git_oid> result;
+
+    git_revwalk *revwalk = nullptr;
+
+    wrap(git_revwalk_new)(&revwalk, repo);
+
+    try {
+      wrap(git_revwalk_hide)(revwalk, &from);
+      wrap(git_revwalk_push)(revwalk, &to);
+
+      git_oid oid;
+      int err;
+
+      while ((err = git_revwalk_next(&oid, revwalk)) == 0) {
+        result.emplace_back(oid);
+      }
+
+      if (err != GIT_ITEROVER) {
+        check_git_error(err);
+      }
+
+    } catch (Error const &) {
+      git_revwalk_free(revwalk);
+      throw;
+    }
+
+    return result;
+  }
+
+  OptionalOID mergebase(git_repository *repo, git_oid const &one, git_oid const &two)
+  {
+    git_oid out;
+    int err = git_merge_base(&out, repo, &one, &two);
+
+    if (err == GIT_ENOTFOUND) {
+      return {};
+    } else {
+      check_git_error(err);
+      return out;
+    }
+  }
+
 }
 
 // EOF

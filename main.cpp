@@ -57,9 +57,23 @@ int main(int argc, char **argv)
     std::sort(branches.begin(), branches.end(), ref_time_larger_sort);
 
     for (auto &ref : branches) {
-      auto commit   = Git::Commit::from_reference(repo, ref);
       auto upstream = ref.branch_upstream();
-      std::cout << format("%1% tracks %2%\n") % ref.branch_name() % (upstream ? upstream->branch_name() : "nothing");
+
+      if (not upstream) {
+        std::cout << format("%1% tracks nothing.\n");
+      } else {
+        auto mb = Git::mergebase(repo, ref, *upstream);
+
+        if (not mb) {
+          std::cout << format("%1% tracks %2% (no mergebase?)\n") % ref.branch_name() % upstream->branch_name();
+        } else {
+          size_t ahead  = revwalk(repo, *mb, ref).size();
+          size_t behind = revwalk(repo, *mb, *upstream).size();
+
+          std::cout << format("%1% tracks %2% A%3%B%4%\n") % ref.branch_name() % upstream->branch_name() % ahead % behind; 
+          
+        }
+      }
     }
 
   } catch (Git::Error const &ge) {
