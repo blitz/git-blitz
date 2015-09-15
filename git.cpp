@@ -33,6 +33,11 @@ namespace Git {
     }
   }
 
+  bool Reference::operator==(Reference const &b) const
+  {
+    return (git_reference_cmp(*this, b) == 0);
+  }
+
   std::string Reference::branch_name() const
   {
     const char *name = nullptr;

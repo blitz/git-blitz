@@ -73,6 +73,7 @@ namespace Git {
     Reference &operator=(Reference &&src) { std::swap(ref, src.ref); return *this; }
 
     operator git_reference *() { return ref; }
+    operator git_reference const *() const { return ref; }
 
     operator git_oid () const {
       auto t = target();
@@ -83,6 +84,8 @@ namespace Git {
 
       return *t;
     }
+
+    bool operator==(Reference const &b) const;
 
     // Wraps git_branch_name.
     std::string branch_name() const;
