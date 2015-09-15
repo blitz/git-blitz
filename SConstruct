@@ -1,6 +1,6 @@
 # -*- Mode: Python -*-
 
-OPTFLAGS = " -g -Os "
+OPTFLAGS = " -Os "
 
 env = Environment(CCFLAGS   = OPTFLAGS,
                   LINKFLAGS = OPTFLAGS,
@@ -8,10 +8,13 @@ env = Environment(CCFLAGS   = OPTFLAGS,
                   LINK      = "clang++",
                   CXXFLAGS  = " -std=c++14 ")
 
+AlwaysBuild(Command('version.inc', ['version.hpp'],
+                    """( cd `dirname $SOURCE` && git describe --always --dirty || echo UNKNOWN ) | sed 's/^\\(.*\\)$/"\\1"/' > $TARGET"""))
+
 # We use libgit2 for git repository access.
 env.ParseConfig("pkg-config libgit2 --cflags --libs")
+env['LIBS'].append('boost_program_options')
 
-
-env.Program("git-blitz", ["main.cpp", "git.cpp"])
+env.Program("git-blitz", Glob("*.cpp"))
 
 # EOF

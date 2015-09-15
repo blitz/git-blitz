@@ -1,4 +1,5 @@
 /git-blitz
+/version.inc
 *.scon*
 *~
 core.*

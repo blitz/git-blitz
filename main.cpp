@@ -1,15 +1,42 @@
-#include <cstdio>
 #include <cstdlib>
 
 #include <algorithm>
+#include <iostream>
 
+#include <boost/program_options.hpp>
+#include <boost/format.hpp>
+
+#include "version.hpp"
 #include "git.hpp"
 
-static const auto g_repository_open = Git::wrap(git_repository_open);
-static const auto g_oid_fromstr     = Git::wrap(git_oid_fromstr);
+namespace po = boost::program_options;
+using format = boost::format;
 
 int main(int argc, char **argv)
 {
+
+  po::options_description desc("Options");
+  desc.add_options()
+    ("help",    "produce help message")
+    ("version", "produce version message");
+
+  po::variables_map vm;
+  bool parse_error = false;
+
+  try {
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
+  } catch (po::error const &e) {
+    std::cerr << e.what() << std::endl;
+    parse_error = true;
+  }
+
+  if (parse_error or vm.count("help") or vm.count("version")) {
+      std::cout << format("%1%\n%2%\n") % banner % desc;
+      return EXIT_SUCCESS;
+  }
+
+
   git_libgit2_init();
   atexit([] { git_libgit2_shutdown(); });
 
@@ -32,11 +59,11 @@ int main(int argc, char **argv)
     for (auto &ref : branches) {
       auto commit   = Git::Commit::from_reference(repo, ref);
       auto upstream = ref.branch_upstream();
-      printf("%s tracks %s\n", ref.branch_name().c_str(), upstream ? upstream->branch_name().c_str() : "nothing");
+      std::cout << format("%1% tracks %2%\n") % ref.branch_name() % (upstream ? upstream->branch_name() : "nothing");
     }
 
   } catch (Git::Error const &ge) {
-    fprintf(stderr, "Git error %d: %s\n", ge.error_code, ge.error->message);
+    std::cerr << format("Git error %1%: %2%\n") % ge.error_code % ge.error->message;
   }
 
   return 0;
