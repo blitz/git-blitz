@@ -75,7 +75,7 @@ int main(int argc, char **argv)
       auto upstream = ref.branch_upstream();
 
       if (not upstream) {
-        std::cout << format("%1% tracks nothing.\n");
+        std::cout << format("%1% tracks nothing.\n") % ref.branch_name();
       } else {
         auto commit = Git::Commit::from_reference(repo, ref);
         auto mb     = Git::mergebase(repo, ref, *upstream);
@@ -95,7 +95,8 @@ int main(int argc, char **argv)
       }
     }
 
-    // remote_branches now contains all
+    // remote_branches now contains all remote branches that didn't
+    // turn up as upstream branches for any local branch.
 
     std::sort(remote_branches.begin(), remote_branches.end(), ref_time_larger_sort);
 
