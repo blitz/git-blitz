@@ -1,4 +1,4 @@
-%global git_hash d1cc2800646436f47b1008f5221ffe8ebad9c84e
+%global git_hash ef1131cf6d5f15905e4d1d4c97adf58d5fd4550c
 
 Summary:        Julian\'s personal git automation tool
 Name:           git-blitz
