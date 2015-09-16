@@ -4,8 +4,8 @@ OPTFLAGS = " -Os "
 
 env = Environment(CCFLAGS   = OPTFLAGS,
                   LINKFLAGS = OPTFLAGS,
-                  CXX       = "clang++",
-                  LINK      = "clang++",
+                  CXX       = "g++",
+                  LINK      = "g++",
                   CXXFLAGS  = " -std=c++14 ")
 
 AlwaysBuild(Command('version.inc', ['version.hpp'],
