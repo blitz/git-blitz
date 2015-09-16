@@ -10,6 +10,7 @@ URL:		https://github.com/blitz/%{name}
 Source0:	https://github.com/blitz/%{name}/archive/%{git_hash}.tar.gz
 
 BuildRequires:	scons
+Requires:	boost-devel
 BuildRequires:	libgit2-devel
 Requires:	boost-program-options
 Requires:	libgit2
@@ -25,7 +26,7 @@ scons %{?_smp_mflags}
 
 %install
 install -m 755 -d %{buildroot}/%{_bindir}
-install -m 755 git-blitz %{buildroot}/%{_bindir}
+install -s -m 755 git-blitz %{buildroot}/%{_bindir}
 
 %files
 %{_bindir}/git-blitz
