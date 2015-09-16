@@ -47,9 +47,14 @@ int main(int argc, char **argv)
       return EXIT_SUCCESS;
   }
 
-
+  // Old versions of libgit don't have the init/shutdown functions.
+#if (LIBGIT2_VER_MAJOR > 0) || (LIBGIT2_VER_MINOR >= 22)
   git_libgit2_init();
   atexit([] { git_libgit2_shutdown(); });
+#else
+  git_threads_init();
+  atexit([] { git_threads_shutdown(); });
+#endif
 
   try {
     auto repo = Git::Repository::from_path(".");
